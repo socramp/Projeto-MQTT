@@ -18,7 +18,7 @@ Data: 06 - 05- 26
 const int pinLampada = 45;
 const int pinoLedRGB = 48;
 const int qntsLEDs = 1;
-const char TOPICO_COMANDO[] = "senai134/esp32/comando";
+const char TOPICO_COMANDO[] = "senai134-g6/comando";
 
 //*=====Instancias=====
 Adafruit_NeoPixel ledRGB(qntsLEDs, pinoLedRGB, NEO_GRB + NEO_KHZ800);

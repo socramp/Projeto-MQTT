@@ -157,7 +157,7 @@ void conectarMQTT()
             }
             else
             {
-                debugInfo("Conectandod MQTT sem usuário e senha.");
+                debugInfo("Conectando MQTT sem usuário e senha.");
                 conectado = mqttClient.connect(MQTT_CLIENT_ID);
             }
         }

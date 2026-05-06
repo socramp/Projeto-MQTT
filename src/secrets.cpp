@@ -16,9 +16,9 @@ const bool USAR_AWL_IOT = false;
 const char* MQTT_BROKER = "cca7f772acad446f96c73d663f3e91a5.s1.eu.hivemq.cloud";
 const int MQTT_PORTA = 8883;
 
-const char* MQTT_CLIENT_ID = "esp32_marcos_sousa";
+const char* MQTT_CLIENT_ID = "esp32_grupo6";
 
-const char* MQTT_USUARIO = "Marcos";
+const char* MQTT_USUARIO = "dKong";
 const char* MQTT_SENHA = "Senai@134";
 
 const bool MQTT_TLS = true;
@@ -67,7 +67,7 @@ const int TOTAL_TOPICOS_PUBLICAR = 3;
 
 const char* TOPICOS_RECEBER[] = {
     "senai134/esp32/comando",
-    "senai134/esp32/config",
+    "senai134-g6/comando",
     "senai134/esp32/display"
 };
 
