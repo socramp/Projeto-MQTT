@@ -16,7 +16,7 @@ const bool USAR_AWL_IOT = false;
 const char* MQTT_BROKER = "cca7f772acad446f96c73d663f3e91a5.s1.eu.hivemq.cloud";
 const int MQTT_PORTA = 8883;
 
-const char* MQTT_CLIENT_ID = "esp32_grupo6";
+const char* MQTT_CLIENT_ID = "esp32_grupo6-marcos";
 
 const char* MQTT_USUARIO = "dKong";
 const char* MQTT_SENHA = "Senai@134";
