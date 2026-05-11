@@ -1,36 +1,24 @@
-/*
-Autor: Marcos Sousa
-Projeto: MQTT
-Descrição: Pojeto
-Versão: 1.0.0
-Data: 06 - 05- 26
-*/
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <AdaFruit_NeoPixel.h>
-#include <LiquidCrystal_I2C.h>
+#include <LED.h>
 
-#include "LED.h"
 #include "WiFiManager.h"
 #include "MqttManager.h"
 #include "DebugManager.h"
 
-//*=====Variaveis======
-bool estadoLampada;
-
 //*=====Constantes======
+const int pinLampada = 45;
 const int pinoLedRGB = 48;
 const int qntsLEDs = 1;
 const char TOPICO_COMANDO[] = "senai134-g6/comando";
+const int pinBotaoBoot = 0;
 
 //*=====Instancias=====
 Adafruit_NeoPixel ledRGB(qntsLEDs, pinoLedRGB, NEO_GRB + NEO_KHZ800);
-Led lampada(10);
-
-LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 //*=====Prototipos=====
-void alterarEstadoLampada();
+void alterarEstadoLampada(bool estadoLampada);
 void alterarCorLedRGB(int vermelho, int verde, int azul);
 void configurarLedRGB();
 void tratarMensagemRecebida(const char *topico, const String &mensagem);
@@ -38,45 +26,43 @@ void tratarJsonComando(const String &mensagem);
 
 void setup()
 {
+  pinMode(pinBotaoBoot, INPUT_PULLUP);
+  pinMode(pinLampada, OUTPUT);
   configurarDebug();
   conectarWiFi();
   configurarMQTT();
   registrarCallbackMensagem(tratarMensagemRecebida);
   conectarMQTT();
   configurarLedRGB();
-
-  lcd.init();
-  lcd.backlight();
-  lcd.setCursor(1, 1);
-  lcd.print("ESTADO DA MAQUINA:");
 }
 
 void loop()
 {
+
   garantirWiFiConectado();
   garantirMQTTConectado();
   loopMQTT();
-  lampada.update();
+  
+  bool estadoAtualBotaoBoot = digitalRead(pinBotaoBoot);
+  int estadoAnteriorBotaoBoot = 1;
 
-  // int valor = 10;
-  // bool estado = true;
+  if(!estadoAtualBotaoBoot && estadoAnteriorBotaoBoot)
+  {
+     JsonDocument doc;
+     String mensagem;
+     
+     doc["EstadoMaquina"] = 4;
 
-  // JsonDocument doc;
-
-  // String mensagem;
-  // doc["valor"] = valor;
-  // doc["estado"] = estado;
-
-  // serializeJson(doc, mensagem);
-
-  // publicarMensagem(topico, mensagem);
+     serializeJson(doc, mensagem);
+  
+    publicarMensagemTopico(0, mensagem.c_str());
+  }
+  estadoAnteriorBotaoBoot = estadoAtualBotaoBoot;
 }
 
-void alterarEstadoLampada()
+void alterarEstadoLampada(bool estadoLampada)
 {
-  debugInfo("estado lampada : " + String(estadoLampada ? "ligado" : "desligado"));
-
-  lampada.setEstado(estadoLampada);
+  digitalWrite(pinLampada, estadoLampada);
 }
 
 void tratarMensagemRecebida(const char *topico, const String &mensagem)
@@ -130,6 +116,7 @@ void alterarCorLedRGB(int vermelho, int verde, int azul)
 
 void tratarJsonComando(const String &mensagem)
 {
+  /*
   JsonDocument doc;
 
   DeserializationError erro = deserializeJson(doc, mensagem);
@@ -141,54 +128,35 @@ void tratarJsonComando(const String &mensagem)
     return;
   }
 
-  if (!doc["EstadoMaquina"].is<int>())
+  if (!doc["led"].is<JsonObject>())
   {
-    debugInfo("Não encontrado o comando para o direcionar o estado da máquina. Use EstadoMaquina");
+    debugInfo("Não encontrado o comando para o LED RGB");
   }
   else
   {
-    int estadoMaquina = doc["EstadoMaquina"].as<int>();
-
-    lcd.setCursor(1, 2);
-
-    if (estadoMaquina == 0)
+    if (!doc["led"]["r"].is<int>() || !doc["led"]["g"].is<int>() || !doc["led"]["g"].is<int>())
     {
-      alterarCorLedRGB(0, 0, 0);
-      estadoLampada = true;
-      lcd.print("Alerta emergencia  ");
-    }
-    else if (estadoMaquina == 1)
-    {
-      alterarCorLedRGB(255, 0, 0);
-      estadoLampada = false;
-      lcd.print("Desligado          ");
-    }
-    else if (estadoMaquina == 2)
-    {
-      alterarCorLedRGB(0, 255, 0);
-      estadoLampada = false;
-      lcd.print("Ligado            ");
-    }
-    else if (estadoMaquina == 3)
-    {
-      alterarCorLedRGB(255, 255, 0);
-      estadoLampada = false;
-      lcd.print("Manutencao        ");
-    }
-    else if (estadoMaquina == 4)
-    {
-      alterarCorLedRGB(0, 0, 255);
-      estadoLampada = false;
-      lcd.print("Parada total      ");
+      debugErro("Json invalido. Use led.r, led.g, led.b");
     }
     else
     {
-      debugErro("Estado da máquina invalido");
-      alterarCorLedRGB(0, 0, 0);
-      estadoLampada = false;
-      lcd.print("Comando invalido  ");
-    }
+      int vermelho = doc["led"]["r"].as<int>();
+      int verde = doc["led"]["g"].as<int>();
+      int azul = doc["led"]["b"].as<int>();
 
-    alterarEstadoLampada();
+      alterarCorLedRGB(vermelho, verde, azul);
+    }
   }
+
+    if (!doc["lampada"].is<bool>())
+    {
+      debugErro("Json invalido.");
+    }
+    else
+    {
+      bool estadoLampada = doc["lampada"].as<bool>();
+
+      alterarEstadoLampada(estadoLampada);
+    }
+      */
 }
